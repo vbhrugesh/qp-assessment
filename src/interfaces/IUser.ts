@@ -5,5 +5,6 @@ export interface IUser extends IBase {
     id: string;
     role: string;
     email: string;
+    name: string;
     orders?: IOrder[]
 }
