@@ -10,16 +10,73 @@ generator client {
 }
 
 model User {
-  @@map(name: "users")
-  id      Int      @default(autoincrement()) @id
-  role RoleEnumType? @default(user)
-  email   String   @unique
-  name    String?
+  id    String        @id @default(uuid())
+  role  RoleEnumType? @default(user)
+  email String        @unique
+  name  String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  orders    Order[]
 
   @@index([email])
+  @@map(name: "users")
+}
+
+model ProductCategory {
+  id       String    @id @default(uuid())
+  name     String
+  products Product[]
+
+  @@map("name: product-categories")
+}
+
+model Product {
+  id          String          @id @default(uuid())
+  name        String
+  category    ProductCategory @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  price       Float
+  description String
+  quantity    Int
+  orderItems  OrderItem[]
+  inventories  Inventory[]
+
+  @@map("name: products")
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  user        User        @relation(fields: [userId], references: [id])
+  orderDate   DateTime
+  totalAmount Float
+  orderItems  OrderItem[]
+  userId      String
+
+  @@map("name: orders")
+}
+
+model OrderItem {
+  id           String  @id @default(uuid())
+  order        Order   @relation(fields: [orderId], references: [id])
+  product      Product @relation(fields: [productId], references: [id])
+  orderId      String
+  productId    String
+  quantity     Int
+  pricePerUnit Float
+
+  @@map("name: order-items")
+}
+
+// Inventory table
+model Inventory {
+  id              String      @id @default(uuid())
+  product         Product  @relation(fields: [productId], references: [id])
+  quantityInStock Int
+  lastUpdated     DateTime @default(now())
+  productId       String
+
+  @@map("name: inventories")
 }
 
 enum RoleEnumType {
