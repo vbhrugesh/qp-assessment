@@ -2,10 +2,10 @@
   "name": "qp-assessment",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "server.ts",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "start": "ts-node src/server.ts",
+    "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
     "prisma:generate": "npx prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
