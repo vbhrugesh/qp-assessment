@@ -1,11 +1,3 @@
-import { IBase } from "./IBase";
-import { IProductCategory } from "./IProductCategory";
+import { Product } from "@prisma/client"
 
-export interface IProduct extends IBase {
-    id: string;
-    name: string;
-    description: string;
-    category: IProductCategory;
-    price: number;
-    quantiity: number;
-}
+export interface IProduct extends Product {}

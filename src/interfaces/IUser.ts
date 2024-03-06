@@ -1,10 +1,3 @@
-import { IBase } from "./IBase";
-import { IOrder } from "./IOrder";
+import { User } from "@prisma/client"
 
-export interface IUser extends IBase {
-    id: string;
-    role: string;
-    email: string;
-    name: string;
-    orders?: IOrder[]
-}
+export interface IUser extends User {}

@@ -1,11 +1,3 @@
-import { IBase } from "./IBase";
-import { IOrder } from "./IOrder";
-import { IProduct } from "./IProduct";
+import { OrderItem } from "@prisma/client"
 
-export interface IOrderItem extends IBase {
-  id: string
-  order: IOrder
-  product: IProduct
-  quantity: number
-  pricePerUnit: number
-}
+export interface IOrderItem extends OrderItem {}

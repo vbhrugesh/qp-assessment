@@ -1,9 +1,3 @@
-import { IBase } from "./IBase";
-import { IProduct } from "./IProduct";
+import { Inventory } from "@prisma/client"
 
-export interface IInventory extends IBase {
-    id: string;
-    product: IProduct
-    quantityInStock: number
-    lastUpdated: Date
-}
+export interface IInventory extends Inventory {}
