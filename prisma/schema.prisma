@@ -30,9 +30,9 @@ model UserToken {
   token String
   expires DateTime
   createdByIp String
-  revoked Boolean
-  revokedByIp String
-  replacedByToken String
+  revoked Boolean @default(false)
+  revokedByIp String @default("")
+  replacedByToken String @default("")
 }
 
 model ProductCategory {
