@@ -4,14 +4,14 @@ import { VerifyOptions } from "jsonwebtoken"
 import { get } from "lodash"
 
 import HttpException from "../exceptions/HttpException"
-import AuthService from "../services/AuthService"
-import UserService from "../services/UserService"
+import UserModel from "../models/UserModel"
+import AuthService from "../services/Auth"
 import JwtHelper from "../utils/JwtHelper"
 
 // Use environment variable for the secret key
 
 const JWTHelper = new JwtHelper()
-const userService = new UserService()
+const userModel = new UserModel()
 const authService = new AuthService()
 
 const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
@@ -37,7 +37,7 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
 
         const userId = get(decoded, "id") || ""
 
-        const user = await userService.findUser({ _id: userId })
+        const user = await userModel.findUser(userId)
         if (!user) {
             throw new HttpException(HttpStatusCode.FORBIDDEN, "Un-authorized")
         }

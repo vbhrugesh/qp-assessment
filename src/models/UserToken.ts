@@ -1,34 +1,20 @@
 import crypto from "crypto"
 
 import { PrismaClient, UserToken } from "@prisma/client"
-import { compare, genSalt, hashSync } from "bcryptjs"
 
-class UserModel {
-    prisma: PrismaClient
+class UserTokenModel {
+    private prisma: PrismaClient
     constructor() {
         this.prisma = new PrismaClient()
     }
 
-    async findUser(userId?: string, email?: string, name?: string) {
-        try {
-            const user = await this.prisma.user.findFirst({
-                where: {
-                    id: userId,
-                    email: email,
-                    name: name,
-                },
-            })
-            return user
-        } catch (error) {
-            let errorMsg = `Something went wrong when fetching user details`
-            if (error instanceof Error) {
-                errorMsg = error.message
-            }
-            throw new Error(errorMsg)
-        }
-    }
-
-    async createUserToken(
+    /**
+     * Creates a new user token.
+     *
+     * @param userId - The ID of the user to create the token for.
+     * @param ipAddress - The IP address of the user creating the token.
+     * @returns The newly created user token.
+     */ async createUserToken(
         userId: string,
         ipAddress: string
     ): Promise<UserToken> {
@@ -51,7 +37,13 @@ class UserModel {
         }
     }
 
-    async findToken(token: string): Promise<UserToken | null> {
+    /**
+     * Find a user token by its token.
+     *
+     * @param token - The token of the user token to find.
+     * @returns The found user token, or null if no token was found.
+     */
+    async findToken(token: string) {
         try {
             const userToken = await this.prisma.userToken.findFirst({
                 where: {
@@ -70,6 +62,81 @@ class UserModel {
             throw new Error(errorMsg)
         }
     }
+
+    /**
+     * Deletes a user token by its ID.
+     *
+     * @param tokenId - The ID of the user token to delete.
+     * @returns The deleted user token, or null if no token was found.
+     */
+    async deleteToken(tokenId: string): Promise<UserToken | null> {
+        try {
+            const userToken = await this.prisma.userToken.delete({
+                where: {
+                    id: tokenId,
+                },
+            })
+            return userToken
+        } catch (error) {
+            let errorMsg = `Something went wrong when deleting user token`
+            if (error instanceof Error) {
+                errorMsg = error.message
+            }
+            throw new Error(errorMsg)
+        }
+    }
+
+    /**
+     * Deletes all user tokens for a given user that have expired.
+     *
+     * @param userId - The ID of the user for which to delete expired tokens.
+     * @returns The deleted user tokens.
+     */
+    async deleteMany(userId: string) {
+        try {
+            const userToken = await this.prisma.userToken.deleteMany({
+                where: {
+                    userId: userId,
+                    expires: {
+                        lt: new Date(),
+                    },
+                },
+            })
+            return userToken
+        } catch (error) {
+            let errorMsg = `Something went wrong when deleting user token`
+            if (error instanceof Error) {
+                errorMsg = error.message
+            }
+            throw new Error(errorMsg)
+        }
+    }
+
+    /**
+     * Find a user token by its user ID.
+     *
+     * @param userId - The ID of the user for which to find the token.
+     * @returns The found user token, or null if no token was found.
+     */
+    async findTokenByUser(userId: string) {
+        try {
+            const userToken = await this.prisma.userToken.findFirst({
+                where: {
+                    userId,
+                },
+                include: {
+                    user: true,
+                },
+            })
+            return userToken
+        } catch (error) {
+            let errorMsg = `Something went wrong when fetching user token`
+            if (error instanceof Error) {
+                errorMsg = error.message
+            }
+            throw new Error(errorMsg)
+        }
+    }
 }
 
-export default UserModel
+export default UserTokenModel

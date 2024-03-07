@@ -42,7 +42,7 @@ model ProductCategory {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt
 
-  @@map("name: product-categories")
+  @@map(name: "product-categories")
 }
 
 model Product {
@@ -58,7 +58,7 @@ model Product {
   orderItems  OrderItem[]
   inventories  Inventory[]
 
-  @@map("name: products")
+  @@map(name: "products")
 }
 
 model Order {
@@ -71,7 +71,7 @@ model Order {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt
 
-  @@map("name: orders")
+  @@map(name: "orders")
 }
 
 model OrderItem {
@@ -85,7 +85,7 @@ model OrderItem {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt
 
-  @@map("name: order-items")
+  @@map(name: "order-items")
 }
 
 // Inventory table
@@ -98,7 +98,7 @@ model Inventory {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt
 
-  @@map("name: inventories")
+  @@map(name: "inventory")
 }
 
 enum RoleEnumType {

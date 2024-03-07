@@ -1,19 +1,21 @@
-import { PrismaClient, RoleEnumType } from "@prisma/client"
+import { PrismaClient, RoleEnumType, User } from "@prisma/client"
 import { compare, genSalt, hashSync } from "bcryptjs"
 
 class UserModel {
-    prisma: PrismaClient
+    private prisma: PrismaClient
     constructor() {
         this.prisma = new PrismaClient()
     }
 
-    async findUser(userId?: string, email?: string, name?: string) {
+    /**
+     * Fetches a user from the database based on the given user ID.
+     * @param userId - The ID of the user to fetch. If not provided, returns the details of the currently authenticated user.
+     * @returns The user details, or null if no user was found.
+     */ async findUser(userId?: string): Promise<User | null> {
         try {
             const user = await this.prisma.user.findFirst({
                 where: {
                     id: userId,
-                    email: email,
-                    name: name,
                 },
             })
             return user
@@ -26,12 +28,46 @@ class UserModel {
         }
     }
 
-    async createUser(
-        email: string,
-        name: string,
-        role: string,
+    /**
+     * Fetches a user from the database based on the given user ID.
+     * @param userId - The ID of the user to fetch. If not provided, returns the details of the currently authenticated user.
+     * @returns The user details, or null if no user was found.
+     */ async findUserByEmail(email: string) {
+        try {
+            const user = await this.prisma.user.findFirst({
+                where: {
+                    email: email,
+                },
+            })
+            return user
+        } catch (error) {
+            let errorMsg = `Something went wrong when fetching user details`
+            if (error instanceof Error) {
+                errorMsg = error.message
+            }
+            throw new Error(errorMsg)
+        }
+    }
+
+    /**
+     * Creates a new user in the database.
+     * @param email - The email address of the user.
+     * @param name - The name of the user.
+     * @param role - The role of the user.
+     * @param password - The password of the user.
+     * @returns The newly created user.
+     */
+    async createUser({
+        email,
+        name,
+        role,
+        password,
+    }: {
+        email: string
+        name: string
+        role: string
         password: string
-    ) {
+    }) {
         try {
             const hashedPassword = await this.hashPassword(password)
             const user = await this.prisma.user.create({
@@ -52,6 +88,11 @@ class UserModel {
         }
     }
 
+    /**
+     * Fetches a user from the database based on the given user ID.
+     * @param userId - The ID of the user to fetch. If not provided, returns the details of the currently authenticated user.
+     * @returns The user details, or null if no user was found.
+     */
     async getAllUsers() {
         try {
             const users = await this.prisma.user.findMany()
@@ -65,6 +106,12 @@ class UserModel {
         }
     }
 
+    /**
+     * Compares the given password with the stored password for the user with the given email.
+     * @param email - The email address of the user.
+     * @param password - The password to compare.
+     * @returns `true` if the passwords match, `false` otherwise.
+     */
     async comparePassword(email: string, password: string) {
         try {
             const user = await this.prisma.user.findFirst({
@@ -86,6 +133,11 @@ class UserModel {
         }
     }
 
+    /**
+     * Hashes a password using bcryptjs.
+     * @param password - The password to hash.
+     * @returns The hashed password.
+     */
     async hashPassword(password: string) {
         try {
             const salt = await genSalt(10)

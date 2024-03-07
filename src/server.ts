@@ -1,13 +1,18 @@
-import express from "express"
-const app = express()
-const PORT = process.env.PORT
+// Load environment variables from the .env file
+import "dotenv/config"
 
-app.use(express.json())
+// Import the App class from the app module
+import App from "./App"
+// Import various controllers for the application
 
-app.get("/", (req, res) => {
-    res.json("hello there")
-})
+/**
+ * Creates a new instance of the application.
+ * @param {Controller[]} controllers - An array of controllers.
+ * @param {number} port - The port on which to listen for incoming requests.
+ */
+const app = new App([], Number(process.env.PORT))
 
-app.listen(PORT, () => {
-    console.log(`listening on port ${PORT}`)
-})
+/**
+ * Starts the server and listens for incoming requests.
+ */
+app.listen()

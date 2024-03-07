@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client"
 import cors from "cors"
 import express, { Application } from "express"
 import HttpStatusCodes from "http-status-codes"
+import morgan from "morgan"
 import passport from "passport"
 
 import HttpException from "./exceptions/HttpException"
@@ -93,7 +94,7 @@ class App {
              * @param req The incoming request.
              * @param res The outgoing response.
              */
-            res.json({ message: "Welcome to Student-of-canada Server" })
+            res.json({ message: "Welcome to Grocery shop backend application" })
         })
     }
 
@@ -103,7 +104,7 @@ class App {
      */
     private initializeControllers(controllers: Controller[]): void {
         controllers.forEach((controller: Controller) => {
-            this.expess.use(`/api/v1${controller.path}`, controller.router)
+            this.expess.use(`/api/${controller.path}`, controller.router)
         })
     }
 
