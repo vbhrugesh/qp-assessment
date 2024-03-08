@@ -7,17 +7,17 @@ import { ResponseHandler } from "../utils/responseHandler"
 import CategoryValidator from "../validators/CategoryValidators"
 
 /**
- * @class Authentication
- * @classdesc This class contains all the routes for authentication
+ * @class ProductCategory
+ * @classdesc This class contains all the routes for categories
  */
 export default class ProductCategoryController {
     /**
-     * @description This is the base route for all the authentication routes
+     * @description This is the base route for all the categories routes
      */
     public path = "/categories"
 
     /**
-     * @description This is the express router for all the authentication routes
+     * @description This is the express router for all the categories routes
      */
     public router = Router()
 
@@ -32,7 +32,7 @@ export default class ProductCategoryController {
     }
 
     /**
-     * @description This method initializes all the routes for authentication
+     * @description This method initializes all the routes for categories
      */
     public initializeRoutes() {
         this.router.get(
