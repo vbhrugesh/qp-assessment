@@ -1,5 +1,4 @@
 import { User } from "@prisma/client"
-import { Request } from "express"
 import passport from "passport"
 // eslint-disable-next-line import/default
 import passportLocal from "passport-local"
@@ -17,8 +16,8 @@ const userModel = new UserModel()
  */
 passport.serializeUser(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (req: Request, user: User, done: (err: unknown, user?: User) => void) => {
-        done(null, user)
+    (user: any, done: (err: unknown, user?: User) => void) => {
+        done(null, user.id)
     }
 )
 /**

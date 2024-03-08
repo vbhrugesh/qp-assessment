@@ -14,11 +14,11 @@ class ProductCategoryModel {
      * @returns The created product category.
      * @throws An error if the product category could not be created.
      */
-    async createProductCate(data: IProductCategory) {
+    async createProductCate({ name }: { name: string }) {
         try {
-            const category = await this.prisma.category.create({
+            const category = await this.prisma.productCategory.create({
                 data: {
-                    ...data,
+                    name,
                 },
             })
             return category
@@ -31,9 +31,26 @@ class ProductCategoryModel {
         }
     }
 
+    async fetchCategory(categoryId: string) {
+        try {
+            const category = await this.prisma.productCategory.findUnique({
+                where: {
+                    id: categoryId,
+                },
+            })
+            return category
+        } catch (error) {
+            let errorMsg = `Something went wrong when fetching category details`
+            if (error instanceof Error) {
+                errorMsg = error.message
+            }
+            throw new Error(errorMsg)
+        }
+    }
+
     async updateProductCate(cateId: string, data: Partial<IProductCategory>) {
         try {
-            const category = await this.prisma.category.update({
+            const category = await this.prisma.productCategory.update({
                 where: {
                     id: cateId,
                 },
@@ -53,7 +70,7 @@ class ProductCategoryModel {
 
     async getAll() {
         try {
-            const categorys = await this.prisma.category.findMany()
+            const categorys = await this.prisma.productCategory.findMany()
             return categorys
         } catch (error) {
             let errorMsg = `Something went wrong when getting all categorys`
@@ -66,7 +83,7 @@ class ProductCategoryModel {
 
     async deleteProductCategory(categoryId: string) {
         try {
-            const category = await this.prisma.category.delete({
+            const category = await this.prisma.productCategory.delete({
                 where: {
                     id: categoryId,
                 },

@@ -104,7 +104,7 @@ class App {
      */
     private initializeControllers(controllers: Controller[]): void {
         controllers.forEach((controller: Controller) => {
-            this.expess.use(`/api/${controller.path}`, controller.router)
+            this.expess.use(`/api${controller.path}`, controller.router)
         })
     }
 

@@ -1,6 +1,3 @@
-import fs from "fs"
-import path from "path"
-
 import {
     sign as JWTSign,
     verify,
@@ -14,18 +11,8 @@ interface DecodedResult {
     decoded: unknown | null
 }
 
-const privateKey = fs.readFileSync(
-    path.join(__dirname, "../../private.key"),
-    "utf8"
-)
-const publicKey = fs.readFileSync(
-    path.join(__dirname, "../../public.key"),
-    "utf8"
-)
-
 export default class JwtHelper {
-    private privateKey: string = privateKey
-    private publicKey: string = publicKey
+    private SECRET_KEY = "SECRET_KEY"
 
     /**
      * Used to decode the given payload into a JWT string
@@ -36,7 +23,7 @@ export default class JwtHelper {
      */
     public decode(token: string, { algorithms }: VerifyOptions): DecodedResult {
         try {
-            const decoded = verify(token, this.publicKey, { algorithms })
+            const decoded = verify(token, this.SECRET_KEY, { algorithms })
 
             return {
                 valid: true,
@@ -64,6 +51,6 @@ export default class JwtHelper {
         object: { [key: string]: unknown },
         options?: SignOptions
     ): string {
-        return JWTSign(object, this.privateKey, options)
+        return JWTSign(object, this.SECRET_KEY, options)
     }
 }
