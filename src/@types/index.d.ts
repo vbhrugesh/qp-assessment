@@ -1,6 +1,8 @@
+import { IUser } from "../interfaces/IUser"
+
 declare global {
     namespace Express {
-        interface User extends IUserModel {
+        interface User extends IUser {
             id?: string
         }
         interface Request {

@@ -3,6 +3,7 @@ import HttpStatusCodes from "http-status-codes"
 
 import HttpException from "../exceptions/HttpException"
 import ProductCategoryModel from "../models/ProductCategory"
+import ProductCategory from "../services/ProductCategory"
 import { ResponseHandler } from "../utils/responseHandler"
 import CategoryValidator from "../validators/CategoryValidators"
 
@@ -22,9 +23,14 @@ export default class ProductCategoryController {
     public router = Router()
 
     /**
-     * @description This is an instance of the auth service
+     * @description This is an instance of the category model
      */
     private categoryModel!: ProductCategoryModel
+
+    /**
+     * @description This is an instance of the category model
+     */
+    private categoryService!: ProductCategory
 
     constructor() {
         this.categoryModel = new ProductCategoryModel()
@@ -41,25 +47,26 @@ export default class ProductCategoryController {
             this.getCategories.bind(this)
         )
         this.router.get(
-            "/{categoryId}",
+            "/:categoryId",
             CategoryValidator.validateCate,
+            CategoryValidator.fetchCategory,
             this.checkCategoryExists.bind(this),
             this.fetchCate.bind(this)
         )
         this.router.post(
-            "/{categoryId}",
+            "/",
             CategoryValidator.validateCate,
             this.checkCategoryExists.bind(this),
             this.createCate.bind(this)
         )
         this.router.put(
-            "/{categoryId}",
+            "/:categoryId",
             CategoryValidator.validateCate,
             this.checkCategoryExists.bind(this),
             this.updateCate.bind(this)
         )
         this.router.delete(
-            "/{categoryId}",
+            "/:categoryId",
             CategoryValidator.validateCate,
             this.checkCategoryExists.bind(this),
             this.deleteCate.bind(this)
@@ -194,7 +201,8 @@ export default class ProductCategoryController {
                     "Please provide the category id"
                 )
             }
-            const category = await this.categoryModel.fetchCategory(cateId)
+            const category =
+                await this.categoryService.checkCategoryExists(cateId)
             res.locals.category = category
             if (!category) {
                 return ResponseHandler.error(

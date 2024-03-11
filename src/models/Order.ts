@@ -1,6 +1,7 @@
-import { PrismaClient } from "@prisma/client"
+import { OrderItem, PrismaClient } from "@prisma/client"
 
-import { IProduct } from "../interfaces/IProduct"
+import { IOrder } from "../interfaces/IOrder"
+import { IOrderItem } from "../interfaces/IOrderItem"
 
 class OrderModel {
     prisma: PrismaClient
@@ -8,16 +9,31 @@ class OrderModel {
         this.prisma = new PrismaClient()
     }
 
-    async createOrder(data: IProduct) {
+    async createOrder({
+        userId,
+        totalPrice,
+        orderItems,
+    }: {
+        userId: string
+        totalPrice: number
+        orderItems: OrderItem[]
+    }) {
         try {
-            const product = await this.prisma.product.create({
+            const order = await this.prisma.order.create({
                 data: {
-                    ...data,
+                    userId,
+                    totalAmount: totalPrice,
+                    orderDate: new Date(),
+                    orderItems: {
+                        createMany: {
+                            data: orderItems,
+                        },
+                    },
                 },
             })
-            return product
+            return order
         } catch (error) {
-            let errorMsg = `Something went wrong when creating product ${name}`
+            let errorMsg = `Something went wrong when creating order ${name}`
             if (error instanceof Error) {
                 errorMsg = error.message
             }
@@ -25,9 +41,9 @@ class OrderModel {
         }
     }
 
-    async updateOrder(productId: string, data: Partial<IProduct>) {
+    async updateOrder(productId: string, data: Partial<IOrder>) {
         try {
-            const product = await this.prisma.product.update({
+            const order = await this.prisma.order.update({
                 where: {
                     id: productId,
                 },
@@ -35,9 +51,9 @@ class OrderModel {
                     ...data,
                 },
             })
-            return product
+            return order
         } catch (error) {
-            let errorMsg = `Something went wrong when creating product ${name}`
+            let errorMsg = `Something went wrong when creating order ${name}`
             if (error instanceof Error) {
                 errorMsg = error.message
             }
@@ -47,7 +63,7 @@ class OrderModel {
 
     async getAll() {
         try {
-            const products = await this.prisma.product.findMany()
+            const products = await this.prisma.order.findMany()
             return products
         } catch (error) {
             let errorMsg = `Something went wrong when getting all products`
@@ -60,14 +76,14 @@ class OrderModel {
 
     async deleteOrder(productId: string) {
         try {
-            const product = await this.prisma.product.delete({
+            const order = await this.prisma.order.delete({
                 where: {
                     id: productId,
                 },
             })
-            return product
+            return order
         } catch (error) {
-            let errorMsg = `Something went wrong when deleting product`
+            let errorMsg = `Something went wrong when deleting order`
             if (error instanceof Error) {
                 errorMsg = error.message
             }

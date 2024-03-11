@@ -8,11 +8,33 @@ class ProductModel {
         this.prisma = new PrismaClient()
     }
 
-    async createProduct(data: IProduct) {
+    /**
+     * Creates a new product in the database.
+     * @param data - The product data to create.
+     * @returns The created product.
+     * @throws An error if the product could not be created.
+     */
+    async createProduct({
+        name,
+        description,
+        categoryId,
+        price,
+        quantity,
+    }: {
+        name: string
+        description: string
+        categoryId: string
+        price: number
+        quantity: number
+    }) {
         try {
             const product = await this.prisma.product.create({
                 data: {
-                    ...data,
+                    name,
+                    description,
+                    categoryId,
+                    price,
+                    quantity,
                 },
             })
             return product
@@ -25,6 +47,13 @@ class ProductModel {
         }
     }
 
+    /**
+     * Updates an existing product in the database.
+     * @param productId - The ID of the product to update.
+     * @param data - The updated product data.
+     * @returns The updated product.
+     * @throws An error if the product could not be updated.
+     */
     async updateProduct(productId: string, data: Partial<IProduct>) {
         try {
             const product = await this.prisma.product.update({
@@ -37,7 +66,7 @@ class ProductModel {
             })
             return product
         } catch (error) {
-            let errorMsg = `Something went wrong when creating product ${name}`
+            let errorMsg = `Something went wrong when updating product ${productId}`
             if (error instanceof Error) {
                 errorMsg = error.message
             }
@@ -45,7 +74,13 @@ class ProductModel {
         }
     }
 
-    async getAll() {
+    /**
+     * Retrieves all products from the database.
+     *
+     * @returns An array of products.
+     * @throws An error if the products could not be retrieved.
+     */
+    async getAll(): Promise<IProduct[]> {
         try {
             const products = await this.prisma.product.findMany()
             return products
@@ -58,7 +93,13 @@ class ProductModel {
         }
     }
 
-    async deleteProductgory(productId: string) {
+    /**
+     * Deletes a product from the database.
+     * @param productId - The ID of the product to delete.
+     * @returns The deleted product.
+     * @throws An error if the product could not be deleted.
+     */
+    async deleteProduct(productId: string): Promise<IProduct> {
         try {
             const product = await this.prisma.product.delete({
                 where: {
@@ -68,6 +109,28 @@ class ProductModel {
             return product
         } catch (error) {
             let errorMsg = `Something went wrong when deleting product`
+            if (error instanceof Error) {
+                errorMsg = error.message
+            }
+            throw new Error(errorMsg)
+        }
+    }
+
+    /**
+     * Retrieves a product by its ID.
+     * @param productId - The ID of the product to retrieve.
+     * @returns The retrieved product, or null if the product could not be found.
+     */
+    async fetchProduct(productId: string): Promise<IProduct | null> {
+        try {
+            const product = await this.prisma.product.findUnique({
+                where: {
+                    id: productId,
+                },
+            })
+            return product
+        } catch (error) {
+            let errorMsg = `Something went wrong when fetching product ${productId}`
             if (error instanceof Error) {
                 errorMsg = error.message
             }
