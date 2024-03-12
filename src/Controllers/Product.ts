@@ -3,9 +3,9 @@ import HttpStatusCodes from "http-status-codes"
 
 import HttpException from "../exceptions/HttpException"
 import ProductModel from "../models/Product"
+import ProductCategory from "../services/ProductCategory"
 import { ResponseHandler } from "../utils/responseHandler"
 import CategoryValidator from "../validators/CategoryValidators"
-import ProductCategory from "../services/ProductCategory"
 
 /**
  * @class ProductCategory

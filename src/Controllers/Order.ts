@@ -42,18 +42,29 @@ export default class Order {
             OrderValidator.validateCreateOrder,
             this.createOrder.bind(this)
         )
-        this.router.get("/:orderId", this.fetchOrder.bind(this))
+        this.router.get(
+            "/:orderId",
+            this.checkOrderExists.bind(this),
+            this.fetchOrder.bind(this)
+        )
         this.router.put(
             "/:orderId",
             OrderValidator.validateCreateOrder,
+            this.checkOrderExists.bind(this),
             this.updateOrder.bind(this)
         )
-        this.router.delete("/:orderId", this.deleteOrder.bind(this))
+        this.router.delete(
+            "/:orderId",
+            this.checkOrderExists.bind(this),
+            this.deleteOrder.bind(this)
+        )
     }
 
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const orders = await this.orderService.getAll()
+            const orders = await this.orderService.getAll(
+                req.user?.id as string
+            )
             return ResponseHandler.success(
                 res,
                 { orders },
@@ -77,10 +88,7 @@ export default class Order {
     ): Promise<void> {
         try {
             const user = req.user
-            const {
-                totalPrice,
-                products,
-            }: { totalPrice: number; products: IOrderProduct[] } = req.body
+            const { products }: { products: IOrderProduct[] } = req.body
             if (!Array.isArray(products)) {
                 throw new HttpException(
                     HttpStatusCodes.BAD_REQUEST,
@@ -89,8 +97,7 @@ export default class Order {
             }
             const order = await this.orderService.createOrder({
                 userId: user?.id as string,
-                totalPrice,
-                products: products as IOrderProduct[],
+                orderItems: products as IOrderProduct[],
             })
             return ResponseHandler.success(
                 res,
@@ -104,10 +111,22 @@ export default class Order {
 
     async updateOrder(req: Request, res: Response, next: NextFunction) {
         try {
-            const order = await this.orderService.updateOrder(req.body)
+            const userId = req.user?.id as string
+            const order = res.locals.order as Order
+            const { products }: { products: IOrderProduct[] } = req.body
+            if (!Array.isArray(products)) {
+                throw new HttpException(
+                    HttpStatusCodes.BAD_REQUEST,
+                    "Invalid products"
+                )
+            }
+            const updatedOrder = await this.orderService.updateOrder({
+                order: order as Order,
+                products: products as IOrderProduct[],
+            })
             return ResponseHandler.success(
                 res,
-                { order },
+                { order: updatedOrder },
                 "Order updated successfully"
             )
         } catch (error) {
@@ -137,6 +156,37 @@ export default class Order {
                 {},
                 "Order deleted successfully"
             )
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async checkOrderExists(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = req.user?.id as string
+            const orderId = req.params.orderId
+            if (!orderId) {
+                throw new HttpException(
+                    HttpStatusCodes.UNPROCESSABLE_ENTITY,
+                    "Please provide the order id"
+                )
+            }
+            const order = await this.orderService.fetchOrder(orderId)
+            if (!order) {
+                throw new HttpException(
+                    HttpStatusCodes.NOT_FOUND,
+                    "Order details not found"
+                )
+            }
+
+            if (order.userId !== userId) {
+                throw new HttpException(
+                    HttpStatusCodes.UNAUTHORIZED,
+                    "You are not authorized to access this resource"
+                )
+            }
+            res.locals.order = order
+            return next()
         } catch (error) {
             next(error)
         }

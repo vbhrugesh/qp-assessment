@@ -8,6 +8,6 @@ export interface IOrder extends Order {}
 
 export interface IOrderProduct {
     productId: string
-    price: number
+    pricePerUnit: number
     quantity: number
 }
