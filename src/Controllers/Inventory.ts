@@ -1,4 +1,5 @@
 import { Router } from "express"
+
 import InventoryService from "../services/Inventory"
 
 /**
