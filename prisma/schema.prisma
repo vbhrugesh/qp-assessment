@@ -10,37 +10,38 @@ generator client {
 }
 
 model User {
-  id    String        @id @default(uuid())
-  role  RoleEnumType? @default(user)
-  email String        @unique
-  name  String?
-  password String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt
+  id        String        @id @default(uuid())
+  role      RoleEnumType? @default(user)
+  email     String        @unique
+  name      String?
+  password  String
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt
   orders    Order[]
-  tokens UserToken[]
+  tokens    UserToken[]
+
   @@index([email])
   @@map(name: "users")
 }
 
 model UserToken {
-  id String @id @default(uuid())
-  user User @relation(fields: [userId], references: [id])
-  userId String
-  token String
-  expires DateTime
-  createdByIp String
-  revoked Boolean @default(false)
-  revokedByIp String @default("")
-  replacedByToken String @default("")
+  id              String   @id @default(uuid())
+  user            User     @relation(fields: [userId], references: [id])
+  userId          String
+  token           String
+  expires         DateTime
+  createdByIp     String
+  revoked         Boolean  @default(false)
+  revokedByIp     String   @default("")
+  replacedByToken String   @default("")
 }
 
 model ProductCategory {
-  id       String    @id @default(uuid())
-  name     String
-  products Product[]
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(uuid())
+  name      String
+  products  Product[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt
 
   @@map(name: "product-categories")
 }
@@ -53,10 +54,10 @@ model Product {
   price       Float
   description String
   quantity    Int
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt
   orderItems  OrderItem[]
-  inventories  Inventory[]
+  inventory   Inventory?      @relation(fields: [id], references: [productId], onDelete: Cascade)
 
   @@map(name: "products")
 }
@@ -68,35 +69,35 @@ model Order {
   totalAmount Float
   orderItems  OrderItem[]
   userId      String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt
 
   @@map(name: "orders")
 }
 
 model OrderItem {
-  id           String  @id @default(uuid())
-  order        Order   @relation(fields: [orderId], references: [id])
-  product      Product @relation(fields: [productId], references: [id])
+  id           String   @id @default(uuid())
+  order        Order    @relation(fields: [orderId], references: [id])
+  product      Product  @relation(fields: [productId], references: [id])
   orderId      String
   productId    String
   quantity     Int
   pricePerUnit Float
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt
 
   @@map(name: "order-items")
 }
 
 // Inventory table
 model Inventory {
-  id              String      @id @default(uuid())
-  product         Product  @relation(fields: [productId], references: [id])
+  id              String   @id @default(uuid())
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantityInStock Int
   lastUpdated     DateTime @default(now())
-  productId       String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt
+  productId       String   @unique
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt
 
   @@map(name: "inventory")
 }

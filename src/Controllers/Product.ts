@@ -6,6 +6,7 @@ import ProductModel from "../models/Product"
 import ProductCategory from "../services/ProductCategory"
 import { ResponseHandler } from "../utils/responseHandler"
 import CategoryValidator from "../validators/CategoryValidators"
+import ProductService from "../services/Product"
 
 /**
  * @class ProductCategory
@@ -30,10 +31,16 @@ export default class ProductCategoryController {
     /**
      * @description This is an instance of the auth service
      */
+    private productService!: ProductService
+
+    /**
+     * @description This is an instance of the auth service
+     */
     private categoryService!: ProductCategory
 
     constructor() {
         this.productModel = new ProductModel()
+        this.productService = new ProductService()
         this.initializeRoutes()
     }
 
@@ -114,13 +121,14 @@ export default class ProductCategoryController {
                 price: number
                 categoryId: string
             } = req.body
-            const product = await this.productModel.createProduct({
-                name,
-                description,
-                quantity,
-                price,
-                categoryId,
-            })
+            const product =
+                await this.productService.createProductWithInventory({
+                    name,
+                    description,
+                    quantity,
+                    price,
+                    categoryId,
+                })
             return ResponseHandler.success(
                 res,
                 { product },

@@ -35,6 +35,14 @@ class ProductModel {
                     categoryId,
                     price,
                     quantity,
+                    inventories: {
+                        create: {
+                            quantityInStock: quantity,
+                        },
+                    },
+                },
+                include: {
+                    inventories: true,
                 },
             })
             return product
